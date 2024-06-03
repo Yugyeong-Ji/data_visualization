@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>[현지's Task] Relationship between Weather Feature and Mosquito Indicator</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+    <div>
+        <label for="feature-select">Select Feature:</label>
+        <select id="feature-select">
+            <option value="mean_T(℃)">Mean Temperature (℃)</option>
+            <option value="min_T(℃)">Min Temperature (℃)</option>
+            <option value="max_T(℃)">Max Temperature (℃)</option>
+            <option value="rain(mm)">Rain (mm)</option>
+        </select>
+    </div>
+
+    <div id="vega-chart"></div>
+
+    <script>
+        const data = "https://yugyeong-ji.github.io/data_visualization/mosquito_Indicator.csv";
+
+        const renderChart = (feature) => {
+            const spec = {
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "data": {
+                    "url": data,
+                    "format": {
+                        "type": "csv"
+                    }
+                },
+                "transform": [
+                    {
+                        "calculate": `datum["${feature}"]`, "as": "selected_feature"
+                    }
+                ],
+                "width": 400,
+                "height": 400,
+                "mark": "bar",
+                "encoding": {
+                    "x": {"field": "selected_feature", "type": "quantitative", "title": feature},
+                    "y": {"field": "mosquito_Indicator", "type": "quantitative"},
+                    "tooltip": [
+                        {"field": "selected_feature", "type": "quantitative", "title": feature},
+                        {"field": "mosquito_Indicator", "type": "quantitative", "title": "Mosquito Indicator"}
+                    ]
+                }
+            };
+
+            vegaEmbed('#vega-chart', spec).catch(console.error);
+        };
+
+        document.getElementById('feature-select').addEventListener('change', (event) => {
+            renderChart(event.target.value);
+        });
+
+        renderChart(document.getElementById('feature-select').value);
+    </script>
+</body>
+</html>
